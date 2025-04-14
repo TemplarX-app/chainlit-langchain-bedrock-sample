@@ -56,5 +56,5 @@ aws bedrock-agent get-knowledge-base-ingestion-job \
 ## Notes
 
 - The script handles pagination for S3 objects, so it works with any number of documents
-- Each batch contains up to 1000 documents as per API limitations
+- Each batch contains up to 25 documents as per API limitations
 - The script automatically skips folder objects in S3
