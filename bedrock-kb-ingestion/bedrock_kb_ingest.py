@@ -61,29 +61,43 @@ def batch_documents(s3_objects, bucket, batch_size=25):
     
     return batches
 
+def retry_with_backoff(func, max_retries=5, initial_delay=1):
+    """Retry a function with exponential backoff."""
+    for attempt in range(max_retries):
+        try:
+            return func()
+        except ClientError as e:
+            if "ValidationException" in str(e) and "concurrent" in str(e):
+                delay = (2 ** attempt) * initial_delay
+                logger.info(f"Concurrent operation limit reached. Retrying in {delay} seconds...")
+                time.sleep(delay)
+                continue
+            raise
+    raise Exception(f"Failed after {max_retries} retries")
+
+
 def ingest_documents_batch(bedrock_agent_client, knowledge_base_id, data_source_id, documents):
     """Ingest a batch of documents into the knowledge base."""
-    try:
+    def ingest():
         response = bedrock_agent_client.ingest_knowledge_base_documents(
             knowledgeBaseId=knowledge_base_id,
             dataSourceId=data_source_id,
             documents=documents
         )
         
-        # Debug the response
         logger.debug(f"API Response: {json.dumps(response, default=str)}")
         
-        # Check if ingestionJobId exists in the response
         if 'ingestionJobId' in response:
             return response['ingestionJobId']
         elif 'jobId' in response:
             return response['jobId']
         else:
-            # If neither key exists, log the response and return a placeholder
             logger.warning(f"Unexpected response format: {json.dumps(response, default=str)}")
             return f"unknown-job-{time.time()}"
-            
-    except ClientError as e:
+    
+    try:
+        return retry_with_backoff(ingest)
+    except Exception as e:
         logger.error(f"Error ingesting documents: {e}")
         raise
 
