@@ -1,6 +1,6 @@
 # Amazon Bedrock Knowledge Base Document Ingestion
 
-This script helps you ingest large numbers of documents into an Amazon Bedrock Knowledge Base, handling the 1000-document limit per API call by automatically batching your documents.
+This script helps you ingest large numbers of documents into an Amazon Bedrock Knowledge Base, handling the 25-document limit per API call by automatically batching your documents.
 
 ## Prerequisites
 
