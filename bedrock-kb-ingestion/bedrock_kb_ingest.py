@@ -61,9 +61,9 @@ def batch_documents(s3_objects, bucket, batch_size=25):
     
     return batches
 
-def retry_with_backoff(func, max_retries=5, initial_delay=1):
+def retry_with_backoff(func, max_retries=100, initial_delay=100):
     """Retry a function with exponential backoff."""
-    for attempt in range(max_retries):
+    for attempt in range(max_retries=max_retries):
         try:
             return func()
         except ClientError as e:
@@ -73,7 +73,7 @@ def retry_with_backoff(func, max_retries=5, initial_delay=1):
                 time.sleep(delay)
                 continue
             raise
-    raise Exception(f"Failed after {max_retries} retries")
+    raise Exception(f"Failed after {max_retries=max_retries} retries")
 
 
 def ingest_documents_batch(bedrock_agent_client, knowledge_base_id, data_source_id, documents):
