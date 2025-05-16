@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to ingest documents into an Amazon Bedrock Knowledge Base.
-Handles batching of documents (25 per API call) for large document sets.
+Handles batching of documents (999 per API call) for large document sets.
 Includes deduplication to avoid re-uploading previously ingested files.
 """
 
@@ -184,7 +184,7 @@ def main():
     parser.add_argument('--region', default='us-east-1', help='AWS region')
     parser.add_argument('--wait', action='store_true', help='Wait for each batch to complete before starting next')
     parser.add_argument('--debug', action='store_true', help='Print debug information')
-    parser.add_argument('--batch-size', type=int, default=25, help='Number of documents per batch (max 25)')
+    parser.add_argument('--batch-size', type=int, default=999, help='Number of documents per batch (max 999)')
     parser.add_argument('--skip-metadata', action='store_true', help='Skip .metadata.json files')
     parser.add_argument('--force-reupload', action='store_true', help='Force reupload of all files, ignoring tracking')
     args = parser.parse_args()
@@ -221,9 +221,9 @@ def main():
     logger.info(f"Found {len(s3_objects)} objects in S3")
     
     # Ensure batch size doesn't exceed API limit
-    batch_size = min(args.batch_size, 25)
-    if args.batch_size > 25:
-        logger.warning(f"Requested batch size {args.batch_size} exceeds API limit. Using maximum of 25.")
+    batch_size = min(args.batch_size, 999)
+    if args.batch_size > 999:
+        logger.warning(f"Requested batch size {args.batch_size} exceeds API limit. Using maximum of 999.")
     
     # Create batches of documents, skipping already processed files
     document_batches = batch_documents(s3_objects, args.bucket, processed_files, batch_size)
