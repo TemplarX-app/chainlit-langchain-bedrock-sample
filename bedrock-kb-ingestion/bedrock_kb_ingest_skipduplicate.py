@@ -60,7 +60,7 @@ def generate_tracking_file_path(knowledge_base_id, data_source_id, bucket, prefi
     os.makedirs(base_dir, exist_ok=True)
     return os.path.join(base_dir, f"processed_files_{unique_id}.json")
 
-def batch_documents(s3_objects, bucket, processed_files, batch_size=25):
+def batch_documents(s3_objects, bucket, processed_files, batch_size=999):
     """Create batches of S3 document references, skipping already processed files."""
     batches = []
     current_batch = []
